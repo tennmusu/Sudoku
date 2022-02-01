@@ -2,49 +2,68 @@
 from select import select
 import pygame as pg, sys
 import random
+import itertools
 from sqlalchemy import false
 from sympy import re
 pg.init()
 screen = pg.display.set_mode((800, 600))
+l = [1,2,3, 4,5,6,7,8,9]
+##  問題データ
+pro=[[0 for j in range(9)] for i in range(9)]
+for yy in range(9):
+    if yy==0:
+        pro[0]
+        p = list(itertools.permutations(l))
+        pro[0]=p[random.randint(0,23)]
+        continue
+    for xx in range(9):
+        l = [1,2,3, 4,5,6,7,8,9]
+        for k in range(yy-1):
+            del l[pro[k][xx]]
+        if xx!=0:
+            for k in range(xx-1):
+                del l[pro[yy][k]]
+        pro[yy][xx]=l[random.randint(0,len(l)-1)]
 ##  入力データ
 board =[-1 for i in range(81)]
 ## ブロックデータ
-blocks = []
+i=0
+block=[-1 for i in range(81)]
 for zz in range(9):
-    block=[]
     for yy in range(3):
         for xx in range(3):
+            
             if yy==0:
                 if xx==0:
                     if zz<=2:
-                        block.append(pg.Rect(xx*30+50+88*zz, yy*30+50, 30, 30))
+                        block[i]=pg.Rect(xx*30+50+88*zz, yy*30+50, 30, 30)
                     elif zz<=5:
-                        block.append(pg.Rect(xx*30+50+88*(zz-3), yy*30+50+88, 30, 30))                       
+                        block[i]=pg.Rect(xx*30+50+88*(zz-3), yy*30+50+88, 30, 30)                    
                     else:
-                        block.append(pg.Rect(xx*30+50+88*(zz-6), yy*30+50+88*2, 30, 30))
+                        block[i]=pg.Rect(xx*30+50+88*(zz-6), yy*30+50+88*2, 30, 30)
                 else:
                     if zz<=2:
-                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*zz, yy*30+50, 30, 30))
+                        block[i]=pg.Rect(xx*30+50-(xx+1)/2+88*zz, yy*30+50, 30, 30)
                     elif zz<=5:
-                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*(zz-3), yy*30+50+88, 30, 30))                       
+                        block[i]=pg.Rect(xx*30+50-(xx+1)/2+88*(zz-3), yy*30+50+88, 30, 30)                      
                     else:
-                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*(zz-6), yy*30+50+88*2, 30, 30))             
+                        block[i]=pg.Rect(xx*30+50-(xx+1)/2+88*(zz-6), yy*30+50+88*2, 30, 30)           
             else:
                 if xx==0:
                      if zz<=2:
-                        block.append(pg.Rect(xx*30+50+88*zz, yy*30+50-(yy+1)/2, 30, 30))
+                        block[i]=pg.Rect(xx*30+50+88*zz, yy*30+50-(yy+1)/2, 30, 30)
                      elif zz<=5:
-                        block.append(pg.Rect(xx*30+50+88*(zz-3),  yy*30+50-(yy+1)/2+88, 30, 30))                       
+                        block[i]=pg.Rect(xx*30+50+88*(zz-3),  yy*30+50-(yy+1)/2+88, 30, 30)                
                      else:
-                        block.append(pg.Rect(xx*30+50+88*(zz-6),  yy*30+50-(yy+1)/2+88*2, 30, 30)) 
+                        block[i]=pg.Rect(xx*30+50+88*(zz-6),  yy*30+50-(yy+1)/2+88*2, 30, 30)
                 else:
                      if zz<=2:
-                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*zz, yy*30+50-(yy+1)/2, 30, 30))
+                        block[i]=pg.Rect(xx*30+50-(xx+1)/2+88*zz, yy*30+50-(yy+1)/2, 30, 30)
                      elif zz<=5:
-                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*(zz-3),  yy*30+50-(yy+1)/2+88, 30, 30))                       
+                        block[i]=pg.Rect(xx*30+50-(xx+1)/2+88*(zz-3),  yy*30+50-(yy+1)/2+88, 30, 30)                   
                      else:
-                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*(zz-6),  yy*30+50-(yy+1)/2+88*2, 30, 30)) 
-    blocks.append(block)
+                        block[i]=pg.Rect(xx*30+50-(xx+1)/2+88*(zz-6),  yy*30+50-(yy+1)/2+88*2, 30, 30) 
+            i+=1
 #数字盤
 input=[]
 for yy in range(3):
@@ -69,6 +88,7 @@ sel=pg.rect
 selin=pg.rect
 selnum=0
 presel=0
+tnum=0
 ## btnを押したら、newpageにジャンプする
 def button_to_jump(btn, newpage):
  global page, pushFlag
@@ -85,7 +105,7 @@ def button_to_jump(btn, newpage):
 ## ゲームステージ
 def gamestage():
     # 3.画面を初期化する
-    global page,score,blocks,sel,selin,board,selnum,presel
+    global page,score,block,sel,selin,board,selnum,presel,tnum    
     global vx, vy
     screen.fill(pg.Color("WHITE"))
     (mx, my) = pg.mouse.get_pos()
@@ -98,7 +118,8 @@ def gamestage():
             
         if selin==i:
                 pg.draw.rect(screen,(165, 197, 246), i)
-                selnum=index             
+                selnum=index   
+                tnum+=1        
         else:
                  pg.draw.rect(screen,pg.Color("WHITE"), i)
         font = pg.font.Font(None, 30)
@@ -106,15 +127,13 @@ def gamestage():
         screen.blit(text, (i.x+9, i.y+7))     
         pg.draw.rect(screen, pg.Color("BLACK"), i, width=1)   
         index+=1
-    q=0
-    for block in blocks:
-        if q==81:
-            break
-        for rect in block:
-            if (my>=rect.y and my<rect.y+30 and mx>=rect.x and mx<rect.x+30 and buttons[0]):
-                sel=rect
+    
+    for q , rect in enumerate(block):
+        if q==81: break
+        if (my>=rect.y and my<rect.y+30 and mx>=rect.x and mx<rect.x+30 and buttons[0]):
+            sel=rect
             
-            if sel==rect:
+        if sel==rect:
                 pg.draw.rect(screen, pg.Color("GOLD"), rect)
                 if selnum!=0:
                     text = font.render(str(selnum), True, pg.Color("BLACK"))
@@ -129,18 +148,17 @@ def gamestage():
                     else:
                         screen.blit(text, (rect.x+9, rect.y+7))
                         board[q]=selnum
-                pg.draw.rect(screen, pg.Color("BLACK"), rect, width=1)                   
-            else:
+                pg.draw.rect(screen, pg.Color("BLACK"), rect, width=1)   
+        else:
                 pg.draw.rect(screen, pg.Color("BLACK"), rect, width=1)
                 if not(board[q]==-1 or board[q]==0):
                    text = font.render(str(board[q]), True, pg.Color("BLACK"))
                    screen.blit(text, (rect.x+9, rect.y+7))
-            q+=1    
+        
 def gamereset():
- global score ,blocks
- blocks = []
+ global score
+ block=[]
 for zz in range(9):
-    block=[]
     for yy in range(3):
         for xx in range(3):
             if yy==0:
@@ -172,8 +190,7 @@ for zz in range(9):
                      elif zz<=5:
                         block.append(pg.Rect(xx*30+50-(xx+1)/2+88*(zz-3),  yy*30+50-(yy+1)/2+88, 30, 30))                       
                      else:
-                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*(zz-6),  yy*30+50-(yy+1)/2+88*2, 30, 30)) 
-    blocks.append(block)   
+                        block.append(pg.Rect(xx*30+50-(xx+1)/2+88*(zz-6),  yy*30+50-(yy+1)/2+88*2, 30, 30))   
 def gameclear():
  gamereset()
  screen.fill(pg.Color("GOLD"))
